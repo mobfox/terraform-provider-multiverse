@@ -70,7 +70,7 @@ func do(action string, d *schema.ResourceData, m interface{}) error {
     result, err := exec.Command(
         d.Get("executor").(string),
         d.Get("script").(string),
-        "create",
+        action,
         d.Get("data").(string)).Output()
 
     if err == nil {
