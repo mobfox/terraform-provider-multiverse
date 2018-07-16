@@ -1,13 +1,13 @@
-ackage main
+package main
 
 import (
-        "github.com/hashicorp/terraform/helper/schema"
+    "github.com/hashicorp/terraform/helper/schema"
 )
 
 func Provider() *schema.Provider {
-        return &schema.Provider{
-                ResourcesMap: map[string]*schema.Resource{
-                        "custom_resource": resourceServer(),
-                },
-        }
+    return &schema.Provider{
+        ResourcesMap: map[string]*schema.Resource{
+            "multiverse_custom_resource": resourceCustom(),
+        },
+    }
 }
