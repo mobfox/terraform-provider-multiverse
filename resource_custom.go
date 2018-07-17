@@ -65,21 +65,30 @@ func onDelete(d *schema.ResourceData, m interface{}) error {
     return do("delete", d, m)
 }
 
-func do(action string, d *schema.ResourceData, m interface{}) error {
-    log.Printf("Executing: %s %s %s %s", d.Get("executor"), d.Get("script"), action, d.Get("data"))
-    result, err := exec.Command(
-        d.Get("executor").(string),
-        d.Get("script").(string),
-        action,
-        d.Get("data").(string)).Output()
+func do(event string, d *schema.ResourceData, m interface{}) error {
+    log.Printf("Executing: %s %s %s %s", d.Get("executor"), d.Get("script"), event, d.Get("data"))
+
+    var context string
+    if event == "delete" {
+        context = d.Id()
+    } else {
+        context = d.Get("data").(string)
+    }
+
+    result, err := exec.Command(d.Get("executor").(string),
+        d.Get("script").(string), event, context).Output()
 
     if err == nil {
         var resource map[string]interface{}
         err = json.Unmarshal([]byte(result), &resource)
         if err == nil {
-            key := d.Get("id_key").(string)
-            d.Set("resource", string(result))
-            d.SetId(resource[key].(string))
+            if event == "delete" {
+                d.SetId("")
+            } else {
+                key := d.Get("id_key").(string)
+                d.Set("resource", string(result))
+                d.SetId(resource[key].(string))
+            }
         }
     }
 
