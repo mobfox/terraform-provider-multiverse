@@ -205,5 +205,14 @@ def send_spotinst_request(method, path, body=None) -> dict:
     logging.debug("Response: %s", response_json)
     return response_json
 
+
+def read_data():
+    data = ''
+    for line in sys.stdin:
+        data += line
+
+    return data
+
 if __name__ == '__main__':
-    print(json.dumps(handler(sys.argv[1], sys.argv[2])))
+    context = read_data()
+    print(json.dumps(handler(sys.argv[1], context)))

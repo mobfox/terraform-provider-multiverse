@@ -1,6 +1,7 @@
 package multiverse
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
@@ -32,8 +33,11 @@ func resourceCustom() *schema.Resource {
 			},
 
 			"data": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeMap,
 				Required: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 
 			"id_key": &schema.Schema{
@@ -68,15 +72,21 @@ func onDelete(d *schema.ResourceData, m interface{}) error {
 func do(event string, d *schema.ResourceData, m interface{}) error {
 	log.Printf("Executing: %s %s %s %s", d.Get("executor"), d.Get("script"), event, d.Get("data"))
 
-	var context string
+	cmd := exec.Command(d.Get("executor").(string), d.Get("script").(string), event)
+
 	if event == "delete" {
-		context = d.Id()
+		cmd.Stdin = bytes.NewReader([]byte(d.Id()))
 	} else {
-		context = d.Get("data").(string)
+		context := d.Get("data").(map[string]interface{})
+		contextJson, err := json.Marshal(context)
+		if err == nil {
+			return nil
+		}
+
+		cmd.Stdin = bytes.NewReader(contextJson)
 	}
 
-	result, err := exec.Command(d.Get("executor").(string),
-		d.Get("script").(string), event, context).Output()
+	result, err := cmd.Output()
 
 	if err == nil {
 		var resource map[string]interface{}
