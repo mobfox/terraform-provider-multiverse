@@ -43,7 +43,7 @@ func resourceCustom() *schema.Resource {
 			},
 
 			"resource": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeMap,
 				Computed: true,
 			},
 		},
@@ -87,7 +87,7 @@ func do(event string, d *schema.ResourceData, m interface{}) error {
 				d.SetId("")
 			} else {
 				key := d.Get("id_key").(string)
-				d.Set("resource", string(result))
+				d.Set("resource", resource)
 				d.SetId(resource[key].(string))
 			}
 		}
