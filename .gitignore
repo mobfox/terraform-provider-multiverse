@@ -4,6 +4,9 @@
 *.dll
 *.so
 *.dylib
+*.iml
+.DS_Store
+bin/
 
 # Test binary, build with `go test -c`
 *.test
