@@ -61,15 +61,19 @@ JSON
 }
 ```
 
-- When you run `terraform apply` the resource will be created
-- When you run `terraform delete` the resource will be destroyed
+- When you run `terraform apply` the resource will be created / updated
+- When you run `terraform destroy` the resource will be destroyed
 
 #### Attributes
+
+##### Input
 
 * `executor (string)` could be anything like python, bash, sh, node, java, awscli ... etc
 * `script (string)` the path to your script or program to run, the script must exit with code 0 and return a valid json
 * `id_key (string)` the key of returned result to be used as id
 * `data (string)` must be a valid json payload
+
+##### Output
 * `resource (map[string])` the output of your script must be a valid json with all keys of type *string* in the form `{"key":"value"}`
 
 
@@ -98,7 +102,7 @@ resource = {
 }
 ```
 
-you can access these attributes using varaibles
+you can access these attributes using variables
 
 ```
 ${multiverse_custom_resource.my_custom_resource.id} # accessing id
@@ -109,11 +113,12 @@ ${multiverse_custom_resource.my_custom_resource.resource["capacity"]}
 #### Why the attribute *data* is stringified JSON?
 
 This will give you flexibility in passing your arguments with mixed types
-We couldn't define a `map[interface{}]` with generic mixed types, 
-if we used map then all attributes have to be explicitly defined in the schema or have the same type
+We couldn't define a with generic mixed types, 
+if we used map then all attributes have to be explicitly defined in the schema or all its attributes have the same type
 
 
-### Developing a script
+Writing a script
+-------------------
 
 Your script must be able to handle the TF event and the JSON payload *data*
 
